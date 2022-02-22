@@ -5,14 +5,12 @@ import { loadPosts } from "../../utils/load-posts"
 import {Button} from "../../components/Button"
 import {TextInput} from "../../components/TextInput"
 
-
-
 export class Home extends Component {
   state = {
     posts: [],
     allPosts: [],
     page: 0,
-    postsPerPage: 2,
+    postsPerPage: 10,
     searchValue: ''
   }
 
