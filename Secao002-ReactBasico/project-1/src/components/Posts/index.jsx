@@ -17,9 +17,10 @@ export const Posts = ({ posts = [] }) => (
   </div>
 );
 
-Posts.defaultProps = {
-  posts: [],
-};
+// Com destructuring isso aqui fica redudante
+// Posts.defaultProps = {
+//   posts: [],
+// };
 
 Posts.propTypes = {
   posts: P.arrayOf(
