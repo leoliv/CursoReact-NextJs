@@ -27,16 +27,17 @@
   color: white;
 }
 
-.button-container {
+.container {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  justify-content: center;
+  gap: 10px;
 }
 
 button {
   width: 120px;
   height: 20px;
-  background-color: white;
+  background-color: #3e3;
   border: 0 solid black;
 }
 
