@@ -1,12 +1,11 @@
 import P from 'prop-types';
 import './App.css';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 
-// React.memo faz a mesma coisa que o useCallback, porem ele salva valores. Nesse caso especificamente está salvando um component inteiro. Mas existe um hook para ele chamado 'useMemo'
-const Button = React.memo(({ incrementButton }) => {
+const Button = ({ incrementButton }) => {
   console.log('Filho, redenrizou');
-  return <button onClick={() => incrementButton(10)}>+</button>;
-});
+  return <button onClick={() => incrementButton(100)}>+</button>;
+};
 
 Button.propTypes = {
   incrementButton: P.func,
@@ -15,21 +14,21 @@ Button.propTypes = {
 function App() {
   const [counter, setCounter] = useState(0);
 
-  // useCallback é usado para fazer o cache de function que não mudam
-  // vai ser salvo na memoria - em cache
   const incrementCounter = useCallback((num) => {
     setCounter((c) => c + num);
-  }, []); // como não tem dependencia, não vai redenrizar. (vai executar apenas 1 vez)
+  }, []);
 
   console.log('Pai, redenrizou');
+
+  const btn = useMemo(() => {
+    return <Button incrementButton={incrementCounter} />;
+  }, [incrementCounter]); // tudo o que for externo, vai ser usado como array de dependencia.
 
   return (
     <div className="App">
       <p>Texto 2</p>
       <h1>C1: {counter}</h1>
-      <div className="container">
-        <Button incrementButton={incrementCounter} />
-      </div>
+      <div className="container">{btn}</div>
     </div>
   );
 }
