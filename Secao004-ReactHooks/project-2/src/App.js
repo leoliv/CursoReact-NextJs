@@ -1,36 +1,56 @@
 import P from 'prop-types';
 import './App.css';
-import React, { useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
-const Button = ({ incrementButton }) => {
-  console.log('Filho, redenrizou');
-  return <button onClick={() => incrementButton(100)}>+</button>;
+const Post = ({ post }) => {
+  return (
+    <div key={post.id} className="post">
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </div>
+  );
 };
 
-Button.propTypes = {
-  incrementButton: P.func,
+Post.propTypes = {
+  post: P.shape({
+    id: P.number,
+    title: P.string,
+    body: P.string,
+  }),
 };
 
 function App() {
-  const [counter, setCounter] = useState(0);
+  const [posts, setPosts] = useState([]);
+  const [value, setValue] = useState('');
+  console.log('Pai, redenrizou!');
 
-  const incrementCounter = useCallback((num) => {
-    setCounter((c) => c + num);
+  // componentDidMount
+  useEffect(() => {
+    setTimeout(function () {
+      fetch('https://jsonplaceholder.typicode.com/posts')
+        .then((r) => r.json())
+        .then((r) => setPosts(r));
+    }, 5000);
   }, []);
-
-  console.log('Pai, redenrizou');
-
-  const btn = useMemo(() => {
-    return <Button incrementButton={incrementCounter} />;
-  }, [incrementCounter]); // tudo o que for externo, vai ser usado como array de dependencia.
-
   return (
     <div className="App">
-      <p>Texto 2</p>
-      <h1>C1: {counter}</h1>
-      <div className="container">{btn}</div>
+      <p>
+        <input
+          type="search"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </p>
+      {useMemo(() => {
+        return (
+          posts.length > 0 &&
+          posts.map((post) => <Post key={post.id} post={post} />)
+        );
+      }, [posts])}
+      {posts.length <= 0 && <p>Ainda n existem posts</p>}
     </div>
   );
 }
+// useMemo vc pode momoizar um component em si para ser memoizado. Agora useCallback é para vc realmente momoizar uma function de callback
 
 export default App;
