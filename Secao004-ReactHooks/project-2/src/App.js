@@ -1,82 +1,62 @@
 import P from 'prop-types';
 import './App.css';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-// useRef => pegar uma referencia para alguma coisa no documento ou para algum valor se quiser
+// O estado globall pode ser usado por qualquer parente da família do component
 
-const Post = ({ post, handleClick }) => {
+const GlobalState = {
+  title: 'O titulo de contexto',
+  body: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,',
+  counter: 0,
+};
+
+const GlobalContext = createContext();
+
+const CompOne = () => {
   return (
-    <div key={post.id} className="post">
-      <h1
-        style={{
-          fontSize: '15px',
-        }}
-        onClick={() => handleClick(post.title)}
-      >
-        {post.title}
-      </h1>
-      <p>{post.body}</p>
-    </div>
+    <>
+      <CompTwo />
+      <CompThree />
+    </>
   );
 };
 
-Post.propTypes = {
-  post: P.shape({
-    id: P.number,
-    title: P.string,
-    body: P.string,
-  }),
-  handleClick: P.func,
+const CompTwo = () => {
+  const theContext = useContext(GlobalContext);
+  const {
+    contextState: { title, counter },
+  } = theContext;
+  return (
+    <h1>
+      {title} {counter}
+    </h1>
+  );
+};
+
+const CompThree = () => {
+  const theContext = useContext(GlobalContext);
+  const {
+    contextState: { body, counter },
+    contextState,
+    setContextState,
+  } = theContext;
+  return (
+    <p
+      onClick={() => setContextState((s) => ({ ...s, counter: s.counter + 1 }))}
+    >
+      {body}
+    </p>
+  );
 };
 
 function App() {
-  const [posts, setPosts] = useState([]);
-  const [value, setValue] = useState('');
-  const input = useRef(null);
-  const contador = useRef(0);
-  console.log('Pai, redenrizou!');
+  const [contextState, setContextState] = useState(GlobalState);
 
-  // componentDidMount
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((r) => r.json())
-      .then((r) => setPosts(r));
-  }, []);
-  const handleClick = (value) => {
-    setValue(value);
-  };
-
-  useEffect(() => {
-    input.current.focus();
-    console.log(input.current);
-  }, [value]);
-
-  useEffect(() => {
-    contador.current++;
-  });
   return (
-    <div className="App">
-      <h1>Rendenrizou: {contador.current}X</h1>
-      <p>
-        <input
-          ref={input}
-          type="search"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      </p>
-      {useMemo(() => {
-        return (
-          posts.length > 0 &&
-          posts.map((post) => (
-            <Post key={post.id} post={post} handleClick={handleClick} />
-          ))
-        );
-      }, [posts])}
-      {posts.length <= 0 && <p>Ainda n existem posts</p>}
-    </div>
+    <GlobalContext.Provider value={{ contextState, setContextState }}>
+      <CompOne />
+    </GlobalContext.Provider>
   );
 }
-// useMemo vc pode momoizar um component em si para ser memoizado. Agora useCallback é para vc realmente momoizar uma function de callback
 
 export default App;
